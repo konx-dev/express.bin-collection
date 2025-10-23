@@ -2,20 +2,6 @@
 
 This is a simple, self-hosted Node.js Express application that uses an SQLite flat-file database to track the next scheduled bin collection based on a static JSON file.
 
-## Project Structure
-
-express.bin-collection/
-├── data/
-│   └── <bin_calendar_here>.json          
-├── src/
-│   ├── server.js               # Main Express API server
-│   └── setup_db.js             # Script to initialize/update the SQLite DB
-├── .gitignore
-├── README.md                
-├── package.json                # Project dependencies and metadata
-└── Dockerfile                  # Instructions for containerized deployment
-
-
 ## Getting Started (Without Docker)
 
 Prerequisites: Node.js (v22+) and npm installed.
@@ -34,7 +20,7 @@ Start Server:
 
 The API will be available at http://localhost:3000.
 
-## Docker Deployment (Recommended)
+## Getting Started (With Docker, Recommended)
 
 Build the Image: Run this command from the root directory:
 
