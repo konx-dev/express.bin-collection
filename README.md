@@ -30,14 +30,6 @@ Run the Container:
 
 `docker run -d --name bin-collection -p 3000:3000 bin-collection-app`
 
--d: Runs the container in the background.
-
---name bin-collection: Gives the container a recognizable name.
-
--p 3000:3000: Maps the container's port 3000 to your host machine's port 3000.
-
-Update Data (Optional): If you update data/bins_2526.json, you must rebuild the image and restart the container to reflect the changes.
-
 ## API Endpoints
 
 `/api/next`

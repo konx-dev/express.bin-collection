@@ -1,0 +1,14 @@
+# Ignore version control folders
+.git
+.github
+
+# Ignore local environment files
+.env
+*.env.local
+
+# Ignore local dependencies
+node_modules
+
+# Ignore OS-specific files
+.DS_Store
+npm-debug.log

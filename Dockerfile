@@ -1,44 +1,42 @@
--------------------------------------------------------------------------
-
-Dockerfile for Bin Calendar API
-
-Builds a lightweight Node.js container that includes the pre-populated DB.
-
--------------------------------------------------------------------------
-
-Use a slim Node.js base image for a small footprint
-
-FROM node:20-slim AS builder
-
-Set the working directory inside the container
+# Stage 1: Builder
+# This stage installs dependencies, copies source code, and builds the database.
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-Copy package.json and package-lock.json (if it exists)
-
+# Copy package files and install dependencies, leverages docker layer caching
 COPY package*.json ./
-
-Install project dependencies
-
 RUN npm install --omit=dev
 
-Copy the source code and data files into the container
-
+# Copy the rest of the application source code and data
 COPY src ./src
 COPY data ./data
 
-=== Initial DB Setup Phase ===
-
-Run the setup script to create the collections.db file based on the JSON data.
-
-The collections.db file is created right in the /app directory.
-
+# Run the setup script to generate the collections.db file
 RUN node src/setup_db.js
 
-Expose the port the application runs on
+# Stage 2: Release
+# This is the final, lightweight production image. It copies only the necessary artifacts from the builder stage.
+FROM node:22-alpine
 
+WORKDIR /app
+
+# Create a non-root user and group
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Copy installed dependencies, source code and database
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/collections.db ./
+
+# Set correct ownership for the app files
+RUN chown -R appuser:appgroup /app
+
+# Switch to the non-root user
+USER appuser
+
+# Expose the port the application runs on
 EXPOSE 3000
 
-=== Command to Run the Application ===
-
+# The command to run the application
 CMD ["node", "src/server.js"]
