@@ -21,6 +21,9 @@ on:
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Required to upload CodeQL results
+      contents: read
 
     steps:
       # --------------------------------------------------------------------
