@@ -1,0 +1,78 @@
+
+# GitHub Actions Workflow: Staging CI
+#
+#   1. Security Scans: Checks for vulnerabilities in both the source code
+#      (using CodeQL) and the project dependencies (using npm audit).
+#   2. Docker Build: Builds the Docker image to ensure it is configured
+#      correctly and can be built without errors.
+
+
+name: Staging CI - Build and Scan
+
+on:
+  # Triggers the workflow on push events but only for the "staging" branch
+  push:
+    branches:
+      - staging
+
+  # Allows workflow to be run manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      # --------------------------------------------------------------------
+      # Step 1: Checkout and Setup
+      # --------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # --------------------------------------------------------------------
+      # Step 2: Dependency Security Scan
+      # --------------------------------------------------------------------
+      - name: Install dependencies for audit
+        run: npm install
+
+      - name: Run npm audit for dependency vulnerabilities
+        # Fails the build only if high-severity vulnerabilities are found
+        run: npm audit --audit-level=high
+
+      # --------------------------------------------------------------------
+      # Step 3: Code Security Scan (CodeQL)
+      # --------------------------------------------------------------------
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          # queries: +security-extended # Uncomment for more detailed scanning
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+      # --------------------------------------------------------------------
+      # Step 4: Docker Image Build Verification
+      # --------------------------------------------------------------------
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        # It serves as a validation that the Dockerfile is correct.
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false # IMPORTANT: Do not push the image
+          tags: express-bin-collection:staging-build
