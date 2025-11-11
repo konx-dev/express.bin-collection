@@ -21,6 +21,7 @@
     "dotenv": "^17.2.3",
     "express": "^4.19.2",
     "express-rate-limit": "^8.2.1",
-    "moment-timezone": "^0.5.45"
+    "moment-timezone": "^0.5.45",
+    "node-cache": "^5.1.2"
   }
 }

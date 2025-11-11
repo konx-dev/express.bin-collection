@@ -43,7 +43,6 @@ For full API documentation and available routes check the[wiki](https://github.c
 
 ## Roadmap
 
-* Caching via node-cache
 * Unit testing
 * Add TypeScript support
 * Improved logging with Winston or Pino
