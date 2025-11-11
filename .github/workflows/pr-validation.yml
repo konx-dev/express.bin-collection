@@ -1,0 +1,68 @@
+# GitHub Actions Workflow: Pull Request Validation
+#
+# Trigger: Runs when a pull request is opened or updated that targets the 'staging' branch.
+#          Can also be run manually via the Actions tab.
+#
+# Jobs:
+#   validate-pr:
+#     - Performs static analysis security scans on code and dependencies.
+#     - Verifies that the Docker image can be built successfully.
+#
+# Purpose: Acts as a quality gate to ensure code meets security and build standards
+#          before it is merged into the staging branch.
+
+name: Pull Request Validation
+
+on:
+  pull_request:
+    branches:
+      - staging
+  workflow_dispatch:
+
+jobs:
+  validate-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # Required for CodeQL to upload results
+
+    steps:
+      # --- Step 1: Setup Environment ---
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # --- Step 2: Dependency Security Scan ---
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Scan for Vulnerable Dependencies
+        run: npm audit --audit-level=high
+
+      # --- Step 3: Code Security Scan ---
+      - name: Initialize CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+      # --- Step 4: Docker Build Verification ---
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Verify Docker Build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false # Only build, do not push
+          tags: pr-validation-build

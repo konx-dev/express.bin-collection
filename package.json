@@ -1,0 +1,26 @@
+{
+  "name": "bin-calendar-api",
+  "version": "1.0.0",
+  "description": "A self-hosted API for retrieving the next scheduled bin collection.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "setup": "node src/setup_db.js"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "sqlite",
+    "calendar",
+    "self-hosted"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^11.2.0",
+    "dotenv": "^17.2.3",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.2.1",
+    "moment-timezone": "^0.5.45"
+  }
+}
