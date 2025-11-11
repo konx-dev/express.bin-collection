@@ -4,7 +4,7 @@ const moment = require('moment-timezone');
 function createCollectionService(db, TIMEZONE) {
     const getNextCollection = () => {
         const today = moment().tz(TIMEZONE).format('YYYY-MM-DD');
-        const stmt = db.prepare(`
+        const query = db.prepare(`
             SELECT date, collection 
             FROM collections 
             WHERE date >= ? 
@@ -12,18 +12,18 @@ function createCollectionService(db, TIMEZONE) {
             ORDER BY date ASC 
             LIMIT 1
         `);
-        return stmt.get(today);
+        return query.get(today);
     };
 
     const getTomorrowCollection = () => {
         const tomorrow = moment().tz(TIMEZONE).add(1, 'days').format('YYYY-MM-DD');
-        const stmt = db.prepare(`
+        const query = db.prepare(`
             SELECT date, collection 
             FROM collections 
             WHERE date = ?
               AND collection IS NOT ''
         `);
-        return stmt.get(tomorrow);
+        return query.get(tomorrow);
     };
 
     return {
