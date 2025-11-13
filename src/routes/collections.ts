@@ -1,22 +1,35 @@
-// src/routes/collections.js
-const express = require('express');
-const cacheMiddleware = require('../middleware/cache');
-const createCollectionService = require('../services/collectionService');
+import express, { Router, Request, Response } from 'express';
+import { Database } from 'better-sqlite3';
+import cacheMiddleware from '../middleware/cache';
+import createCollectionService from '../services/collectionService';
 
-function createCollectionsRouter(db, TIMEZONE) {
-    const router = express.Router();
-    const collectionService = createCollectionService(db, TIMEZONE);
+// --- INTERFACES ---
+export interface Collection {
+    type: string;
+    date: string;
+    description?: string;
+}
 
-    // Apply the cache middleware to all GET requests in this router
+interface CollectionService {
+    getNextCollection: () => Collection | null;
+    getTomorrowCollection: () => Collection | null;
+}
+
+// --- ROUTER FUNCTION ---
+function createCollectionsRouter(db: Database, TIMEZONE: string): Router {
+    const router: Router = express.Router();
+    
+    const collectionService: CollectionService = createCollectionService(db, TIMEZONE);
+
     router.use(cacheMiddleware);
 
     /**
      * API Endpoint: /next
      * Finds the next scheduled collection.
      */
-    router.get('/next', (req, res) => {
+    router.get('/next', (req: Request, res: Response): Response => {
         try {
-            const nextCollection = collectionService.getNextCollection();
+            const nextCollection: Collection | null = collectionService.getNextCollection();
 
             if (nextCollection) {
                 return res.json({
@@ -40,9 +53,9 @@ function createCollectionsRouter(db, TIMEZONE) {
      * API Endpoint: /tomorrow
      * Checks for a scheduled collection for the next day.
      */
-    router.get('/tomorrow', (req, res) => {
+    router.get('/tomorrow', (req: Request, res: Response): Response => {
         try {
-            const tomorrowCollection = collectionService.getTomorrowCollection();
+            const tomorrowCollection: Collection | null = collectionService.getTomorrowCollection();
 
             if (tomorrowCollection) {
                 return res.json({
@@ -51,9 +64,9 @@ function createCollectionsRouter(db, TIMEZONE) {
                     collection: tomorrowCollection
                 });
             } else {
-                return res.json({
-                    status: 'error',
-                    message: 'No collections scheduled for tomorrow.'
+                return res.json({ 
+                    status: 'error', 
+                    message: 'No collections scheduled for tomorrow.' 
                 });
             }
         } catch (error) {
@@ -65,4 +78,4 @@ function createCollectionsRouter(db, TIMEZONE) {
     return router;
 }
 
-module.exports = createCollectionsRouter;
+export default createCollectionsRouter;

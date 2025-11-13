@@ -24,10 +24,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      security-events: write # Required for CodeQL to upload results
+      security-events: write
 
     steps:
-      # --- Step 1: Setup Environment ---
+      # --- Setup Environment ---
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -36,18 +36,21 @@ jobs:
         with:
           node-version: '22'
 
-      # --- Step 2: Dependency Security Scan ---
+      # --- Dependency & Build Checks ---
       - name: Install Dependencies
         run: npm install
 
       - name: Scan for Vulnerable Dependencies
         run: npm audit --audit-level=high
 
-      # --- Step 3: Code Security Scan ---
+      - name: TypeScript Compilation Check
+        run: npm run build
+
+      # --- Code Security Scan (CodeQL) ---
       - name: Initialize CodeQL Analysis
         uses: github/codeql-action/init@v3
         with:
-          languages: javascript
+          languages: typescript, javascript
 
       - name: Perform CodeQL Autobuild
         uses: github/codeql-action/autobuild@v3
@@ -55,7 +58,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
 
-      # --- Step 4: Docker Build Verification ---
+      # --- Docker Build Verification ---
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -64,5 +67,5 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          push: false # Only build, do not push
+          push: false
           tags: pr-validation-build
