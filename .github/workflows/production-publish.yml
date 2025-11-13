@@ -26,16 +26,27 @@ jobs:
       security-events: write
       
     steps:
-      # --- Step 1: Setup Environment ---
+      # --- Step 1: Setup Environment & Build ---
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # --- Step 2: Code Security Scan (MANDATORY FOR SECURITY TAB) ---
-      # Runs the CodeQL analysis on the final 'master' commit.
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          
+      - name: Install Dependencies
+        
+        run: npm install
+
+      - name: TypeScript Compilation
+        run: npm run build
+
+      # --- Code Security Scan ---
       - name: Initialize CodeQL Analysis
         uses: github/codeql-action/init@v3
         with:
-          languages: javascript
+          languages: typescript, javascript 
 
       - name: Perform CodeQL Autobuild
         uses: github/codeql-action/autobuild@v3
@@ -43,7 +54,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
 
-      # --- Step 3: Login and Metadata ---
+      # --- Login and Metadata ---
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -60,7 +71,7 @@ jobs:
             type=raw,value=latest,enable=true
             type=sha,prefix=v,enable=true,format=short
 
-      # --- Step 4: Build and Push Docker Image ---
+      # --- Build and Push Docker Image ---
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 

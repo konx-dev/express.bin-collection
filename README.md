@@ -7,16 +7,18 @@ This is a simple, self-hosted Node.js Express application that uses an SQLite fl
 Prerequisites: Node.js (v22+) and npm installed.
 
 Install Dependencies:
-
 `npm install`
 
-Initialize Database: This reads provided json file in data and creates collections.db.
+It reads the provided JSON file in the data/ folder and creates or updates collections.db.
+`npm run setup`
 
-`node src/setup_db.js`
+We must first compile the TypeScript source code into production JavaScript.
+`npm run build`
 
-Start Server:
+`npm start`
 
-`node src/server.js`
+For local development with file watching and automatic restarts, use:
+`npm run start:dev`
 
 The API will be available at http://localhost:3000.
 
@@ -44,6 +46,5 @@ For full API documentation and available routes check the[wiki](https://github.c
 ## Roadmap
 
 * Unit testing
-* Add TypeScript support
 * Improved logging with Winston or Pino
 * Optional sheet validation step before running setup_db.js
