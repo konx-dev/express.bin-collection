@@ -6,6 +6,7 @@ COPY package*.json ./
 RUN npm install
 
 # Copy the application source code and data
+COPY tsconfig.json ./
 COPY src ./src
 COPY data ./data
 
