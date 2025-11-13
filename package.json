@@ -4,8 +4,11 @@
   "description": "A self-hosted API for retrieving the next scheduled bin collection.",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "setup": "node src/setup_db.js"
+    "start": "node dist/server.js",
+    "start:dev": "nodemon --exec ts-node src/server.ts",
+    "setup": "node dist/setup_db.js",
+    "setup:ts": "ts-node src/setup_db.ts",
+    "build": "tsc"
   },
   "keywords": [
     "node",
@@ -23,5 +26,17 @@
     "express-rate-limit": "^8.2.1",
     "moment-timezone": "^0.5.45",
     "node-cache": "^5.1.2"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.5",
+    "@types/express-rate-limit": "^5.1.3",
+    "@types/moment-timezone": "^0.5.13",
+    "@types/node": "^24.10.1",
+    "@types/node-cache": "^4.1.3",
+    "nodemon": "^3.1.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }
